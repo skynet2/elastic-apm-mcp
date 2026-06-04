@@ -37,7 +37,7 @@ func TestTraceGetHandler_Success(t *testing.T) {
 		{
 			name: "with_entry_transaction",
 			args: map[string]any{
-				"trace_id":            "trace-456",
+				"trace_id":             "trace-456",
 				"entry_transaction_id": "tx-789",
 			},
 			traceID: "trace-456",
@@ -131,6 +131,18 @@ func TestTraceSearchHandler_Success(t *testing.T) {
 				End:     defaultEnd,
 			},
 			response: []map[string]any{{"trace": map[string]any{"id": "abc"}}},
+			wantJSON: `"trace"`,
+		},
+		{
+			name: "default_size",
+			args: map[string]any{"service": "svc"},
+			params: apm.TraceSearchParams{
+				Service: "svc",
+				Size:    0,
+				Start:   defaultStart,
+				End:     defaultEnd,
+			},
+			response: []map[string]any{{"trace": map[string]any{"id": "def"}}},
 			wantJSON: `"trace"`,
 		},
 	}

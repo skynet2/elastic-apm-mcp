@@ -50,13 +50,14 @@ func reqMap(req mcplib.CallToolRequest, key string) (map[string]any, error) {
 }
 
 func resolveRange(req mcplib.CallToolRequest, now func() time.Time) (string, string, error) {
+	t := now()
 	startRaw := req.GetString("start", "now-15m")
 	endRaw := req.GetString("end", "now")
-	s, err := apm.ResolveTime(startRaw, now())
+	s, err := apm.ResolveTime(startRaw, t)
 	if err != nil {
 		return "", "", fmt.Errorf("invalid start: %w", err)
 	}
-	e, err := apm.ResolveTime(endRaw, now())
+	e, err := apm.ResolveTime(endRaw, t)
 	if err != nil {
 		return "", "", fmt.Errorf("invalid end: %w", err)
 	}

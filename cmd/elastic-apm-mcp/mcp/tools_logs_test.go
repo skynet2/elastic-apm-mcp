@@ -57,6 +57,18 @@ func TestLogsSearchHandler_Success(t *testing.T) {
 			response: []map[string]any{},
 			wantJSON: `[]`,
 		},
+		{
+			name: "default_size",
+			args: map[string]any{"trace_id": "trace-def"},
+			params: apm.LogsParams{
+				TraceID: "trace-def",
+				Size:    0,
+				Start:   defaultStart,
+				End:     defaultEnd,
+			},
+			response: []map[string]any{{"message": "default"}},
+			wantJSON: `"message"`,
+		},
 	}
 
 	for _, tc := range cases {

@@ -364,15 +364,23 @@ func TestEnvironmentsHandler_Success(t *testing.T) {
 func TestEnvironmentsHandler_Failure(t *testing.T) {
 	cases := []struct {
 		name        string
+		args        map[string]any
 		setupMock   func(*mocks.MockAPMClient)
 		errContains string
 	}{
 		{
 			name: "client_error",
+			args: map[string]any{},
 			setupMock: func(m *mocks.MockAPMClient) {
 				m.EXPECT().Environments(gomock.Any(), defaultStart, defaultEnd).Return(nil, errors.New("env fail"))
 			},
 			errContains: "env fail",
+		},
+		{
+			name:        "invalid_start",
+			args:        map[string]any{"start": "bogus"},
+			setupMock:   func(m *mocks.MockAPMClient) {},
+			errContains: "invalid start",
 		},
 	}
 
@@ -385,7 +393,7 @@ func TestEnvironmentsHandler_Failure(t *testing.T) {
 			tc.setupMock(m)
 
 			h := environmentsHandler(m, zerolog.Nop(), fixedClock)
-			result, err := h(context.Background(), newReq(map[string]any{}))
+			result, err := h(context.Background(), newReq(tc.args))
 
 			require.NoError(t, err)
 			assert.True(t, result.IsError)
