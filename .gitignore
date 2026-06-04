@@ -15,4 +15,6 @@ config.local.yaml
 # project-specific
 docs/plans/
 config.dev.json
-.idea/
+config.dev.env
+config.dev.*
+*.env
