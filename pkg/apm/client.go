@@ -127,6 +127,9 @@ func (c *Client) handleError(resp *http.Response) error {
 	case http.StatusForbidden:
 		return ErrForbidden
 	}
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return &APIError{StatusCode: resp.StatusCode, Message: fmt.Sprintf("read error body: %v", err)}
+	}
 	return &APIError{StatusCode: resp.StatusCode, Message: string(body)}
 }

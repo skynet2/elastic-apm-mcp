@@ -57,7 +57,7 @@ api_key: my-api-key
 		},
 		{
 			name:      "env only",
-			yaml:      "",
+			yaml:      "\n",
 			envs:      map[string]string{"APM_URL": "https://env.example.com", "APM_API_KEY": "env-key"},
 			wantURL:   "https://env.example.com",
 			wantKey:   "env-key",
@@ -75,24 +75,6 @@ api_key: my-api-key
 			wantTO:    30 * time.Second,
 			wantLevel: "info",
 		},
-		{
-			name: "yaml headers map",
-			yaml: `
-url: https://kibana.example.com
-api_key: my-api-key
-headers:
-  CF-Access-Client-Id: cid-value
-  CF-Access-Client-Secret: csecret-value
-`,
-			wantURL:   "https://kibana.example.com",
-			wantKey:   "my-api-key",
-			wantTO:    30 * time.Second,
-			wantLevel: "info",
-			wantHdrs: map[string]string{
-				"cf-access-client-id":     "cid-value",
-				"cf-access-client-secret": "csecret-value",
-			},
-		},
 	}
 
 	for _, tc := range tests {
@@ -101,10 +83,7 @@ headers:
 				t.Setenv(k, v)
 			}
 
-			path := ""
-			if tc.yaml != "" {
-				path = writeYAML(t, tc.yaml)
-			}
+			path := writeYAML(t, tc.yaml)
 
 			cfg, err := config.Load(path)
 			require.NoError(t, err)
@@ -112,11 +91,26 @@ headers:
 			assert.Equal(t, tc.wantKey, cfg.APIKey)
 			assert.Equal(t, tc.wantTO, cfg.Timeout)
 			assert.Equal(t, tc.wantLevel, cfg.LogLevel)
-			if tc.wantHdrs != nil {
-				assert.Equal(t, tc.wantHdrs, cfg.Headers)
-			}
+			assert.Equal(t, tc.wantHdrs, cfg.Headers)
 		})
 	}
+}
+
+func TestLoad_Headers_Success(t *testing.T) {
+	path := writeYAML(t, `
+url: https://kibana.example.com
+api_key: my-api-key
+headers:
+  CF-Access-Client-Id: cid-value
+  CF-Access-Client-Secret: csecret-value
+`)
+
+	cfg, err := config.Load(path)
+	require.NoError(t, err)
+	assert.Equal(t, map[string]string{
+		"cf-access-client-id":     "cid-value",
+		"cf-access-client-secret": "csecret-value",
+	}, cfg.Headers)
 }
 
 func TestLoad_Failure(t *testing.T) {
