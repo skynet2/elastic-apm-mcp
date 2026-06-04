@@ -39,19 +39,10 @@ func TestErrorGet_Success(t *testing.T) {
 			assert.Equal(t, "logs-apm*", params["index"])
 
 			eseBody := params["body"].(map[string]any)
-			query := eseBody["query"].(map[string]any)
-			boolQ := query["bool"].(map[string]any)
-			filters := boolQ["filter"].([]any)
-			found := false
-			for _, f := range filters {
-				fm := f.(map[string]any)
-				if term, ok := fm["term"].(map[string]any); ok {
-					if term["error.id"] == "err-123" {
-						found = true
-					}
-				}
-			}
-			assert.True(t, found, "filter for error.id must exist")
+			filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
+			assert.ElementsMatch(t, []any{
+				map[string]any{"term": map[string]any{"error.id": "err-123"}},
+			}, filters)
 			assert.NotContains(t, eseBody, "sort", "errorId path must not set sort")
 			assert.NotContains(t, eseBody, "size", "errorId path must not set size")
 
@@ -70,19 +61,12 @@ func TestErrorGet_Success(t *testing.T) {
 			body := decodeEseRequest(t, r)
 			params := body["params"].(map[string]any)
 			eseBody := params["body"].(map[string]any)
-			query := eseBody["query"].(map[string]any)
-			boolQ := query["bool"].(map[string]any)
-			filters := boolQ["filter"].([]any)
-			found := false
-			for _, f := range filters {
-				fm := f.(map[string]any)
-				if term, ok := fm["term"].(map[string]any); ok {
-					if term["error.grouping_key"] == "gkey-1" {
-						found = true
-					}
-				}
-			}
-			assert.True(t, found, "filter for error.grouping_key must exist")
+			filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
+			assert.ElementsMatch(t, []any{
+				map[string]any{"term": map[string]any{"error.grouping_key": "gkey-1"}},
+			}, filters)
+			assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
+			assert.Equal(t, float64(1), eseBody["size"])
 			cannedEseResponse(w, map[string]any{"error": map[string]any{"grouping_key": "gkey-1"}})
 		})
 
@@ -122,20 +106,16 @@ func TestLogsSearch_Success(t *testing.T) {
 		assert.Equal(t, "logs-apm*,logs-*", params["index"])
 
 		eseBody := params["body"].(map[string]any)
-		query := eseBody["query"].(map[string]any)
-		boolQ := query["bool"].(map[string]any)
-		filters := boolQ["filter"].([]any)
-
-		foundTrace := false
-		for _, f := range filters {
-			fm := f.(map[string]any)
-			if term, ok := fm["term"].(map[string]any); ok {
-				if term["trace.id"] == "trace-abc" {
-					foundTrace = true
-				}
-			}
-		}
-		assert.True(t, foundTrace, "trace.id filter must exist")
+		filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
+		assert.ElementsMatch(t, []any{
+			map[string]any{"term": map[string]any{"trace.id": "trace-abc"}},
+			map[string]any{"range": map[string]any{"@timestamp": map[string]any{
+				"gte": "2024-01-01T00:00:00.000Z",
+				"lte": "2024-01-02T00:00:00.000Z",
+			}}},
+		}, filters)
+		assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
+		assert.Equal(t, float64(50), eseBody["size"])
 
 		cannedEseResponse(w, map[string]any{"trace": map[string]any{"id": "trace-abc"}})
 	})
@@ -167,25 +147,17 @@ func TestTraceSearch_Success(t *testing.T) {
 		assert.Equal(t, "traces-apm*", params["index"])
 
 		eseBody := params["body"].(map[string]any)
-		query := eseBody["query"].(map[string]any)
-		boolQ := query["bool"].(map[string]any)
-		filters := boolQ["filter"].([]any)
-
-		foundEvent := false
-		foundSvc := false
-		for _, f := range filters {
-			fm := f.(map[string]any)
-			if term, ok := fm["term"].(map[string]any); ok {
-				if term["processor.event"] == "transaction" {
-					foundEvent = true
-				}
-				if term["service.name"] == "my-svc" {
-					foundSvc = true
-				}
-			}
-		}
-		assert.True(t, foundEvent, "processor.event filter must exist")
-		assert.True(t, foundSvc, "service.name filter must exist")
+		filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
+		assert.ElementsMatch(t, []any{
+			map[string]any{"term": map[string]any{"processor.event": "transaction"}},
+			map[string]any{"term": map[string]any{"service.name": "my-svc"}},
+			map[string]any{"range": map[string]any{"@timestamp": map[string]any{
+				"gte": "2024-01-01T00:00:00.000Z",
+				"lte": "2024-01-02T00:00:00.000Z",
+			}}},
+		}, filters)
+		assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
+		assert.Equal(t, float64(50), eseBody["size"])
 
 		cannedEseResponse(w, map[string]any{"trace": map[string]any{"id": "t1"}})
 	})
