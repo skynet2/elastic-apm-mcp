@@ -22,7 +22,6 @@ func Load(path string) (Config, error) {
 	v := viper.New()
 	v.SetEnvPrefix("APM")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	v.AutomaticEnv()
 
 	v.SetDefault("timeout", "30s")
 	v.SetDefault("log_level", "info")
@@ -48,6 +47,13 @@ func Load(path string) (Config, error) {
 		return Config{}, fmt.Errorf("config: unmarshal: %w", err)
 	}
 
+	for k, val := range parseHeaders(os.Getenv("APM_HEADERS")) {
+		if cfg.Headers == nil {
+			cfg.Headers = map[string]string{}
+		}
+		cfg.Headers[k] = val
+	}
+
 	if cfg.URL == "" {
 		return Config{}, errors.New("config: url is required")
 	}
@@ -57,4 +63,20 @@ func Load(path string) (Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func parseHeaders(s string) map[string]string {
+	out := map[string]string{}
+	for _, pair := range strings.Split(s, ",") {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(kv[0])
+		if key == "" {
+			continue
+		}
+		out[key] = strings.TrimSpace(kv[1])
+	}
+	return out
 }

@@ -111,6 +111,35 @@ headers:
 	}, cfg.Headers)
 }
 
+func TestLoad_HeadersFromEnv_Success(t *testing.T) {
+	t.Setenv("APM_URL", "https://kibana.example.com")
+	t.Setenv("APM_API_KEY", "my-api-key")
+	t.Setenv("APM_HEADERS", "CF-Access-Client-Id=cid-value,CF-Access-Client-Secret=sec=with=eq")
+
+	cfg, err := config.Load("")
+	require.NoError(t, err)
+	assert.Equal(t, map[string]string{
+		"CF-Access-Client-Id":     "cid-value",
+		"CF-Access-Client-Secret": "sec=with=eq",
+	}, cfg.Headers)
+}
+
+func TestLoad_HeadersEnvOverridesYAML_Success(t *testing.T) {
+	t.Setenv("APM_HEADERS", "CF-Access-Client-Id=env-cid")
+
+	path := writeYAML(t, `
+url: https://kibana.example.com
+api_key: my-api-key
+headers:
+  X-Static: yaml-value
+`)
+
+	cfg, err := config.Load(path)
+	require.NoError(t, err)
+	assert.Equal(t, "env-cid", cfg.Headers["CF-Access-Client-Id"])
+	assert.Equal(t, "yaml-value", cfg.Headers["x-static"])
+}
+
 func TestLoad_Failure(t *testing.T) {
 	tests := []struct {
 		name    string
