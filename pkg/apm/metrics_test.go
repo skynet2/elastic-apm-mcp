@@ -12,29 +12,44 @@ import (
 
 func TestServiceMetrics_Success(t *testing.T) {
 	tests := []struct {
-		name     string
-		metric   string
-		wantPath string
+		name        string
+		metric      string
+		wantPath    string
+		wantTxType  string
+		wantDocType string
+		wantLatAgg  string
 	}{
 		{
-			name:     "latency",
-			metric:   "latency",
-			wantPath: "/internal/apm/services/my-svc/transactions/charts/latency",
+			name:        "latency",
+			metric:      "latency",
+			wantPath:    "/internal/apm/services/my-svc/transactions/charts/latency",
+			wantTxType:  "request",
+			wantDocType: "transactionMetric",
+			wantLatAgg:  "avg",
 		},
 		{
-			name:     "throughput",
-			metric:   "throughput",
-			wantPath: "/internal/apm/services/my-svc/throughput",
+			name:        "throughput",
+			metric:      "throughput",
+			wantPath:    "/internal/apm/services/my-svc/throughput",
+			wantTxType:  "request",
+			wantDocType: "transactionMetric",
+			wantLatAgg:  "",
 		},
 		{
-			name:     "error_rate",
-			metric:   "error_rate",
-			wantPath: "/internal/apm/services/my-svc/transactions/charts/error_rate",
+			name:        "error_rate",
+			metric:      "error_rate",
+			wantPath:    "/internal/apm/services/my-svc/transactions/charts/error_rate",
+			wantTxType:  "request",
+			wantDocType: "transactionMetric",
+			wantLatAgg:  "",
 		},
 		{
-			name:     "breakdown",
-			metric:   "breakdown",
-			wantPath: "/internal/apm/services/my-svc/transaction/charts/breakdown",
+			name:        "breakdown",
+			metric:      "breakdown",
+			wantPath:    "/internal/apm/services/my-svc/transaction/charts/breakdown",
+			wantTxType:  "request",
+			wantDocType: "",
+			wantLatAgg:  "",
 		},
 	}
 
@@ -42,6 +57,10 @@ func TestServiceMetrics_Success(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, tt.wantPath, r.URL.Path)
+				assert.Equal(t, tt.wantTxType, r.URL.Query().Get("transactionType"))
+				assert.Equal(t, tt.wantDocType, r.URL.Query().Get("documentType"))
+				assert.Equal(t, tt.wantLatAgg, r.URL.Query().Get("latencyAggregationType"))
+				assert.Equal(t, "production", r.URL.Query().Get("environment"))
 				w.Header().Set("Content-Type", "application/json")
 				_ = json.NewEncoder(w).Encode(map[string]any{})
 			})

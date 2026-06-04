@@ -19,10 +19,7 @@ type serviceListResponse struct {
 
 func (c *Client) ServiceList(ctx context.Context, p ServiceListParams) ([]Service, error) {
 	q := url.Values{}
-	q.Set("environment", orDefault(p.Environment, "ENVIRONMENT_ALL"))
-	q.Set("kuery", p.Kuery)
-	q.Set("start", p.Start)
-	q.Set("end", p.End)
+	setCommonParams(q, p.Environment, p.Start, p.End, p.Kuery)
 	q.Set("documentType", "serviceTransactionMetric")
 	q.Set("rollupInterval", "1m")
 	q.Set("useDurationSummary", "true")

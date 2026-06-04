@@ -16,10 +16,7 @@ type ErrorGroupsParams struct {
 
 func (c *Client) ErrorGroups(ctx context.Context, p ErrorGroupsParams) (map[string]any, error) {
 	q := url.Values{}
-	q.Set("environment", orDefault(p.Environment, "ENVIRONMENT_ALL"))
-	q.Set("start", p.Start)
-	q.Set("end", p.End)
-	q.Set("kuery", p.Kuery)
+	setCommonParams(q, p.Environment, p.Start, p.End, p.Kuery)
 
 	path := "/internal/apm/services/" + url.PathEscape(p.Service) + "/errors/groups/main_statistics"
 	var result map[string]any

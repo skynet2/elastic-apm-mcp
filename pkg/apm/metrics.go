@@ -20,19 +20,15 @@ type ServiceMetricsParams struct {
 
 func (c *Client) ServiceMetrics(ctx context.Context, p ServiceMetricsParams) (map[string]any, error) {
 	svc := url.PathEscape(p.Service)
-	env := orDefault(p.Environment, "ENVIRONMENT_ALL")
 	txType := orDefault(p.TransactionType, "request")
 
 	var path string
 	q := url.Values{}
+	setCommonParams(q, p.Environment, p.Start, p.End, p.Kuery)
 
 	switch p.Metric {
 	case "latency":
 		path = "/internal/apm/services/" + svc + "/transactions/charts/latency"
-		q.Set("environment", env)
-		q.Set("start", p.Start)
-		q.Set("end", p.End)
-		q.Set("kuery", p.Kuery)
 		q.Set("transactionType", txType)
 		q.Set("useDurationSummary", "true")
 		if p.TransactionName != "" {
@@ -48,10 +44,6 @@ func (c *Client) ServiceMetrics(ctx context.Context, p ServiceMetricsParams) (ma
 
 	case "throughput":
 		path = "/internal/apm/services/" + svc + "/throughput"
-		q.Set("environment", env)
-		q.Set("start", p.Start)
-		q.Set("end", p.End)
-		q.Set("kuery", p.Kuery)
 		q.Set("transactionType", txType)
 		if p.Offset != "" {
 			q.Set("offset", p.Offset)
@@ -65,10 +57,6 @@ func (c *Client) ServiceMetrics(ctx context.Context, p ServiceMetricsParams) (ma
 
 	case "error_rate":
 		path = "/internal/apm/services/" + svc + "/transactions/charts/error_rate"
-		q.Set("environment", env)
-		q.Set("start", p.Start)
-		q.Set("end", p.End)
-		q.Set("kuery", p.Kuery)
 		q.Set("transactionType", txType)
 		if p.TransactionName != "" {
 			q.Set("transactionName", p.TransactionName)
@@ -82,10 +70,6 @@ func (c *Client) ServiceMetrics(ctx context.Context, p ServiceMetricsParams) (ma
 
 	case "breakdown":
 		path = "/internal/apm/services/" + svc + "/transaction/charts/breakdown"
-		q.Set("environment", env)
-		q.Set("start", p.Start)
-		q.Set("end", p.End)
-		q.Set("kuery", p.Kuery)
 		if p.TransactionName != "" {
 			q.Set("transactionName", p.TransactionName)
 		}

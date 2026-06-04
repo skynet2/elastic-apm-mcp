@@ -41,6 +41,9 @@ func TestServiceList_Success(t *testing.T) {
 				End:   "2024-01-02T00:00:00.000Z",
 			},
 			wantEnv:     "ENVIRONMENT_ALL",
+			wantKuery:   "",
+			wantStart:   "2024-01-01T00:00:00.000Z",
+			wantEnd:     "2024-01-02T00:00:00.000Z",
 			wantSvcName: "my-service",
 		},
 	}
@@ -50,9 +53,9 @@ func TestServiceList_Success(t *testing.T) {
 			client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 				assert.Equal(t, "/internal/apm/services", r.URL.Path)
 				assert.Equal(t, tt.wantEnv, r.URL.Query().Get("environment"))
-				if tt.wantKuery != "" {
-					assert.Equal(t, tt.wantKuery, r.URL.Query().Get("kuery"))
-				}
+				assert.Equal(t, tt.wantKuery, r.URL.Query().Get("kuery"))
+				assert.Equal(t, tt.wantStart, r.URL.Query().Get("start"))
+				assert.Equal(t, tt.wantEnd, r.URL.Query().Get("end"))
 				assert.Equal(t, "serviceTransactionMetric", r.URL.Query().Get("documentType"))
 				assert.Equal(t, "1m", r.URL.Query().Get("rollupInterval"))
 				assert.Equal(t, "true", r.URL.Query().Get("useDurationSummary"))

@@ -52,6 +52,8 @@ func TestErrorGet_Success(t *testing.T) {
 				}
 			}
 			assert.True(t, found, "filter for error.id must exist")
+			assert.NotContains(t, eseBody, "sort", "errorId path must not set sort")
+			assert.NotContains(t, eseBody, "size", "errorId path must not set size")
 
 			cannedEseResponse(w, map[string]any{"error": map[string]any{"id": "err-123"}})
 		})

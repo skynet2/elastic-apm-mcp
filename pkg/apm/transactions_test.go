@@ -17,7 +17,6 @@ func TestTransactionGroups_Success(t *testing.T) {
 		wantPath   string
 		wantEnv    string
 		wantTxType string
-		wantTxName string
 	}{
 		{
 			name: "explicit params",
