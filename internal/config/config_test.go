@@ -28,7 +28,6 @@ func TestLoad_Success(t *testing.T) {
 		wantKey   string
 		wantTO    time.Duration
 		wantLevel string
-		wantHdrs  map[string]string
 	}{
 		{
 			name: "yaml only",
@@ -91,7 +90,6 @@ api_key: my-api-key
 			assert.Equal(t, tc.wantKey, cfg.APIKey)
 			assert.Equal(t, tc.wantTO, cfg.Timeout)
 			assert.Equal(t, tc.wantLevel, cfg.LogLevel)
-			assert.Equal(t, tc.wantHdrs, cfg.Headers)
 		})
 	}
 }

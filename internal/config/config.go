@@ -28,7 +28,9 @@ func Load(path string) (Config, error) {
 	v.SetDefault("log_level", "info")
 
 	for _, k := range []string{"url", "api_key", "timeout", "log_level"} {
-		_ = v.BindEnv(k)
+		if err := v.BindEnv(k); err != nil {
+			return Config{}, fmt.Errorf("config: bind env %s: %w", k, err)
+		}
 	}
 
 	if path != "" {

@@ -50,7 +50,7 @@ func TestResolveTime_Failure(t *testing.T) {
 	}
 }
 
-func TestISO(t *testing.T) {
-	got := ISO(time.Date(2026, 6, 4, 16, 49, 0, 0, time.UTC))
+func TestFormatISO(t *testing.T) {
+	got := FormatISO(time.Date(2026, 6, 4, 16, 49, 0, 0, time.UTC))
 	assert.Equal(t, "2026-06-04T16:49:00Z", got)
 }

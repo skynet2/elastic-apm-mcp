@@ -1,11 +1,8 @@
 package apm
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type eseRequest struct {
@@ -26,8 +23,7 @@ type eseRawResponse struct {
 }
 
 type eseHits struct {
-	Total int      `json:"total"`
-	Hits  []eseHit `json:"hits"`
+	Hits []eseHit `json:"hits"`
 }
 
 type eseHit struct {
@@ -42,19 +38,8 @@ func (c *Client) eseSearch(ctx context.Context, index string, body map[string]an
 		},
 	}
 
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("apm: ese marshal: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/internal/search/ese", bytes.NewReader(data))
-	if err != nil {
-		return nil, fmt.Errorf("apm: ese build request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-
 	var resp eseResponse
-	if err := c.do(req, &resp); err != nil {
+	if err := c.postRaw(ctx, "/internal/search/ese", payload, &resp); err != nil {
 		return nil, fmt.Errorf("apm: ese search: %w", err)
 	}
 

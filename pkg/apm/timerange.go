@@ -47,6 +47,6 @@ func parseRelative(expr string, now time.Time) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("apm: unknown time unit %q in expression: %q", unit, expr)
 }
 
-func ISO(t time.Time) string {
+func FormatISO(t time.Time) string {
 	return t.UTC().Format(time.RFC3339Nano)
 }

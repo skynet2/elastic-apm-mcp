@@ -57,11 +57,28 @@ func (c *Client) get(ctx context.Context, path string, query url.Values, out any
 }
 
 func (c *Client) post(ctx context.Context, path string, query url.Values, body any, out any) error {
+	req, err := c.buildPostRequest(ctx, path, query, body)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Elastic-Api-Version", elasticAPIVersion)
+	return c.do(req, out)
+}
+
+func (c *Client) postRaw(ctx context.Context, path string, body any, out any) error {
+	req, err := c.buildPostRequest(ctx, path, nil, body)
+	if err != nil {
+		return err
+	}
+	return c.do(req, out)
+}
+
+func (c *Client) buildPostRequest(ctx context.Context, path string, query url.Values, body any) (*http.Request, error) {
 	var bodyReader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
 		if err != nil {
-			return fmt.Errorf("apm: marshal body: %w", err)
+			return nil, fmt.Errorf("apm: marshal body: %w", err)
 		}
 		bodyReader = bytes.NewReader(data)
 	}
@@ -73,14 +90,13 @@ func (c *Client) post(ctx context.Context, path string, query url.Values, body a
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, rawURL, bodyReader)
 	if err != nil {
-		return fmt.Errorf("apm: build request: %w", err)
+		return nil, fmt.Errorf("apm: build request: %w", err)
 	}
 
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	req.Header.Set("Elastic-Api-Version", elasticAPIVersion)
-	return c.do(req, out)
+	return req, nil
 }
 
 func (c *Client) do(req *http.Request, out any) error {
