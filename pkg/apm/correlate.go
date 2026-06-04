@@ -3,7 +3,11 @@ package apm
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strings"
 )
+
+var simpleKueryFieldRe = regexp.MustCompile(`^[A-Za-z_@][A-Za-z0-9_.@-]*$`)
 
 type ErrorGetParams struct {
 	ErrorID     string
@@ -46,8 +50,13 @@ func buildBoolQuery(filters []map[string]any, sort []map[string]any, size int) m
 }
 
 func addKueryFilter(filters []map[string]any, kuery string) []map[string]any {
-	if kuery == "" {
+	if strings.TrimSpace(kuery) == "" {
 		return filters
+	}
+	if field, value, ok := parseSimpleKuery(kuery); ok {
+		return append(filters, map[string]any{
+			"match": map[string]any{field: value},
+		})
 	}
 	return append(filters, map[string]any{
 		"query_string": map[string]any{
@@ -55,6 +64,30 @@ func addKueryFilter(filters []map[string]any, kuery string) []map[string]any {
 			"analyze_wildcard": true,
 		},
 	})
+}
+
+func parseSimpleKuery(kuery string) (string, string, bool) {
+	k := strings.TrimSpace(kuery)
+	idx := strings.Index(k, ":")
+	if idx <= 0 {
+		return "", "", false
+	}
+	field := strings.TrimSpace(k[:idx])
+	value := strings.TrimSpace(k[idx+1:])
+	if !simpleKueryFieldRe.MatchString(field) {
+		return "", "", false
+	}
+	if len(value) >= 2 && value[0] == '"' && value[len(value)-1] == '"' {
+		inner := value[1 : len(value)-1]
+		if inner == "" || strings.Contains(inner, `"`) {
+			return "", "", false
+		}
+		return field, inner, true
+	}
+	if value == "" || strings.ContainsAny(value, " :\"*()<>") {
+		return "", "", false
+	}
+	return field, value, true
 }
 
 func addTimeRangeFilter(filters []map[string]any, start, end string) []map[string]any {
