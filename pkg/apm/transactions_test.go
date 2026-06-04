@@ -12,12 +12,12 @@ import (
 
 func TestTransactionGroups_Success(t *testing.T) {
 	tests := []struct {
-		name        string
-		params      TransactionGroupsParams
-		wantPath    string
-		wantEnv     string
-		wantTxType  string
-		wantTxName  string
+		name       string
+		params     TransactionGroupsParams
+		wantPath   string
+		wantEnv    string
+		wantTxType string
+		wantTxName string
 	}{
 		{
 			name: "explicit params",

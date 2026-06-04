@@ -62,12 +62,24 @@ type TraceError struct {
 			Type    string `json:"type"`
 		} `json:"exception"`
 	} `json:"error"`
-	Service     struct{ Name string `json:"name"` }  `json:"service"`
-	Transaction struct{ ID string `json:"id"` }      `json:"transaction"`
-	Span        struct{ ID string `json:"id"` }      `json:"span"`
-	Trace       struct{ ID string `json:"id"` }      `json:"trace"`
-	Parent      struct{ ID string `json:"id"` }      `json:"parent"`
-	Timestamp   struct{ Us int64 `json:"us"` }       `json:"timestamp"`
+	Service struct {
+		Name string `json:"name"`
+	} `json:"service"`
+	Transaction struct {
+		ID string `json:"id"`
+	} `json:"transaction"`
+	Span struct {
+		ID string `json:"id"`
+	} `json:"span"`
+	Trace struct {
+		ID string `json:"id"`
+	} `json:"trace"`
+	Parent struct {
+		ID string `json:"id"`
+	} `json:"parent"`
+	Timestamp struct {
+		Us int64 `json:"us"`
+	} `json:"timestamp"`
 }
 
 type Trace struct {

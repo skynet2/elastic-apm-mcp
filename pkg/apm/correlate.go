@@ -51,7 +51,7 @@ func addKueryFilter(filters []map[string]any, kuery string) []map[string]any {
 	}
 	return append(filters, map[string]any{
 		"query_string": map[string]any{
-			"query":           kuery,
+			"query":            kuery,
 			"analyze_wildcard": true,
 		},
 	})
