@@ -1,0 +1,1 @@
+{"transactionGroups":[{"name":"GET /checkout","latency":8061.1,"throughput":216.0,"errorRate":0.01,"impact":14.4,"alertsCount":0,"transactionType":"request"}],"maxCountExceeded":false,"hasActiveAlerts":false}

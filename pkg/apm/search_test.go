@@ -2,7 +2,6 @@ package apm
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +11,8 @@ import (
 )
 
 func TestEseSearch_Success(t *testing.T) {
+	envelope := eseEnvelopeFromFixture(t, "testdata/log_doc.json")
+
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		assert.Equal(t, "/internal/search/ese", r.URL.Path)
@@ -21,43 +22,28 @@ func TestEseSearch_Success(t *testing.T) {
 		assert.Equal(t, "true", r.Header.Get("kbn-xsrf"))
 		assert.Equal(t, "Kibana", r.Header.Get("x-elastic-internal-origin"))
 
-		var reqBody map[string]any
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&reqBody))
-
-		params, _ := reqBody["params"].(map[string]any)
+		body := decodeEseRequest(t, r)
+		params, _ := body["params"].(map[string]any)
 		assert.Equal(t, "logs-apm*,logs-*", params["index"])
 
-		body, _ := params["body"].(map[string]any)
-		assert.NotNil(t, body)
+		eseBody, _ := params["body"].(map[string]any)
+		assert.NotNil(t, eseBody)
 
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"rawResponse": map[string]any{
-				"hits": map[string]any{
-					"total": 2,
-					"hits": []any{
-						map[string]any{"_source": map[string]any{"message": "log line 1", "trace.id": "abc"}},
-						map[string]any{"_source": map[string]any{"message": "log line 2", "trace.id": "abc"}},
-					},
-				},
-			},
-			"isPartial": false,
-			"isRunning": false,
-		})
+		_, _ = w.Write(envelope)
 	}))
 	t.Cleanup(srv.Close)
 
 	client := New(Config{BaseURL: srv.URL, APIKey: "test-key", HTTPClient: srv.Client()})
 	sources, err := client.eseSearch(context.Background(), "logs-apm*,logs-*", map[string]any{
-		"size": 2,
+		"size": 1,
 		"query": map[string]any{
-			"term": map[string]any{"trace.id": "abc"},
+			"term": map[string]any{"trace.id": "traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
 		},
 	})
 	require.NoError(t, err)
-	require.Len(t, sources, 2)
-	assert.Equal(t, "log line 1", sources[0]["message"])
-	assert.Equal(t, "log line 2", sources[1]["message"])
+	require.Len(t, sources, 1)
+	assert.Equal(t, "processing checkout", sources[0]["message"])
 }
 
 func TestEseSearch_Failure(t *testing.T) {

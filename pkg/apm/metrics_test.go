@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,21 +12,26 @@ import (
 )
 
 func TestServiceMetrics_Success(t *testing.T) {
+	latencyData, err := os.ReadFile("testdata/metrics_latency.json")
+	require.NoError(t, err)
+
 	tests := []struct {
-		name        string
-		metric      string
-		wantPath    string
-		wantTxType  string
-		wantDocType string
-		wantLatAgg  string
+		name         string
+		metric       string
+		wantPath     string
+		wantTxType   string
+		wantDocType  string
+		wantLatAgg   string
+		responseBody []byte
 	}{
 		{
-			name:        "latency",
-			metric:      "latency",
-			wantPath:    "/internal/apm/services/my-svc/transactions/charts/latency",
-			wantTxType:  "request",
-			wantDocType: "transactionMetric",
-			wantLatAgg:  "avg",
+			name:         "latency",
+			metric:       "latency",
+			wantPath:     "/internal/apm/services/my-svc/transactions/charts/latency",
+			wantTxType:   "request",
+			wantDocType:  "transactionMetric",
+			wantLatAgg:   "avg",
+			responseBody: latencyData,
 		},
 		{
 			name:        "throughput",
@@ -62,7 +68,11 @@ func TestServiceMetrics_Success(t *testing.T) {
 				assert.Equal(t, tt.wantLatAgg, r.URL.Query().Get("latencyAggregationType"))
 				assert.Equal(t, "production", r.URL.Query().Get("environment"))
 				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(map[string]any{})
+				if len(tt.responseBody) > 0 {
+					_, _ = w.Write(tt.responseBody)
+				} else {
+					_ = json.NewEncoder(w).Encode(map[string]any{})
+				}
 			})
 
 			result, err := client.ServiceMetrics(context.Background(), ServiceMetricsParams{

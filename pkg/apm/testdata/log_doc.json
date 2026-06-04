@@ -1,0 +1,1 @@
+{"@timestamp":"2026-06-04T16:42:15.000Z","message":"processing checkout","log":{"level":"info"},"service":{"name":"payment-service"},"trace":{"id":"traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"transaction":{"id":"txn0000000000001"},"span":{"id":"span000000000001"}}

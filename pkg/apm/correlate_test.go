@@ -4,15 +4,22 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func cannedEseResponse(w http.ResponseWriter, source map[string]any) {
-	w.Header().Set("Content-Type", "application/json")
-	_ = json.NewEncoder(w).Encode(map[string]any{
+func eseEnvelopeFromFixture(t *testing.T, fixturePath string) []byte {
+	t.Helper()
+	raw, err := os.ReadFile(fixturePath)
+	require.NoError(t, err)
+
+	var source map[string]any
+	require.NoError(t, json.Unmarshal(raw, &source))
+
+	envelope := map[string]any{
 		"rawResponse": map[string]any{
 			"hits": map[string]any{
 				"hits": []any{
@@ -20,7 +27,10 @@ func cannedEseResponse(w http.ResponseWriter, source map[string]any) {
 				},
 			},
 		},
-	})
+	}
+	out, err := json.Marshal(envelope)
+	require.NoError(t, err)
+	return out
 }
 
 func decodeEseRequest(t *testing.T, r *http.Request) map[string]any {
@@ -31,6 +41,8 @@ func decodeEseRequest(t *testing.T, r *http.Request) map[string]any {
 }
 
 func TestErrorGet_Success(t *testing.T) {
+	errorDocEnvelope := eseEnvelopeFromFixture(t, "testdata/error_doc.json")
+
 	t.Run("by errorId", func(t *testing.T) {
 		client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, "/internal/search/ese", r.URL.Path)
@@ -41,19 +53,20 @@ func TestErrorGet_Success(t *testing.T) {
 			eseBody := params["body"].(map[string]any)
 			filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
 			assert.ElementsMatch(t, []any{
-				map[string]any{"term": map[string]any{"error.id": "err-123"}},
+				map[string]any{"term": map[string]any{"error.id": "erraaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}},
 			}, filters)
 			assert.NotContains(t, eseBody, "sort", "errorId path must not set sort")
 			assert.NotContains(t, eseBody, "size", "errorId path must not set size")
 
-			cannedEseResponse(w, map[string]any{"error": map[string]any{"id": "err-123"}})
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errorDocEnvelope)
 		})
 
-		results, err := client.ErrorGet(context.Background(), ErrorGetParams{ErrorID: "err-123"})
+		results, err := client.ErrorGet(context.Background(), ErrorGetParams{ErrorID: "erraaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"})
 		require.NoError(t, err)
 		require.Len(t, results, 1)
 		errDoc := results[0]["error"].(map[string]any)
-		assert.Equal(t, "err-123", errDoc["id"])
+		assert.Equal(t, "erraaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", errDoc["id"])
 	})
 
 	t.Run("by groupingKey", func(t *testing.T) {
@@ -63,16 +76,20 @@ func TestErrorGet_Success(t *testing.T) {
 			eseBody := params["body"].(map[string]any)
 			filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
 			assert.ElementsMatch(t, []any{
-				map[string]any{"term": map[string]any{"error.grouping_key": "gkey-1"}},
+				map[string]any{"term": map[string]any{"error.grouping_key": "grp0000000000001"}},
 			}, filters)
 			assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
 			assert.Equal(t, float64(1), eseBody["size"])
-			cannedEseResponse(w, map[string]any{"error": map[string]any{"grouping_key": "gkey-1"}})
+
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write(errorDocEnvelope)
 		})
 
-		results, err := client.ErrorGet(context.Background(), ErrorGetParams{GroupingKey: "gkey-1"})
+		results, err := client.ErrorGet(context.Background(), ErrorGetParams{GroupingKey: "grp0000000000001"})
 		require.NoError(t, err)
 		require.Len(t, results, 1)
+		errDoc := results[0]["error"].(map[string]any)
+		assert.Equal(t, "grp0000000000001", errDoc["grouping_key"])
 	})
 }
 
@@ -99,6 +116,8 @@ func TestErrorGet_Failure(t *testing.T) {
 }
 
 func TestLogsSearch_Success(t *testing.T) {
+	logDocEnvelope := eseEnvelopeFromFixture(t, "testdata/log_doc.json")
+
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/internal/search/ese", r.URL.Path)
 		body := decodeEseRequest(t, r)
@@ -108,7 +127,7 @@ func TestLogsSearch_Success(t *testing.T) {
 		eseBody := params["body"].(map[string]any)
 		filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
 		assert.ElementsMatch(t, []any{
-			map[string]any{"term": map[string]any{"trace.id": "trace-abc"}},
+			map[string]any{"term": map[string]any{"trace.id": "traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}},
 			map[string]any{"range": map[string]any{"@timestamp": map[string]any{
 				"gte": "2024-01-01T00:00:00.000Z",
 				"lte": "2024-01-02T00:00:00.000Z",
@@ -117,16 +136,18 @@ func TestLogsSearch_Success(t *testing.T) {
 		assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
 		assert.Equal(t, float64(50), eseBody["size"])
 
-		cannedEseResponse(w, map[string]any{"trace": map[string]any{"id": "trace-abc"}})
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(logDocEnvelope)
 	})
 
 	results, err := client.LogsSearch(context.Background(), LogsParams{
-		TraceID: "trace-abc",
+		TraceID: "traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		Start:   "2024-01-01T00:00:00.000Z",
 		End:     "2024-01-02T00:00:00.000Z",
 	})
 	require.NoError(t, err)
 	require.Len(t, results, 1)
+	assert.Equal(t, "processing checkout", results[0]["message"])
 }
 
 func TestLogsSearch_Failure(t *testing.T) {
@@ -140,6 +161,8 @@ func TestLogsSearch_Failure(t *testing.T) {
 }
 
 func TestTraceSearch_Success(t *testing.T) {
+	logDocEnvelope := eseEnvelopeFromFixture(t, "testdata/log_doc.json")
+
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/internal/search/ese", r.URL.Path)
 		body := decodeEseRequest(t, r)
@@ -150,7 +173,7 @@ func TestTraceSearch_Success(t *testing.T) {
 		filters := eseBody["query"].(map[string]any)["bool"].(map[string]any)["filter"].([]any)
 		assert.ElementsMatch(t, []any{
 			map[string]any{"term": map[string]any{"processor.event": "transaction"}},
-			map[string]any{"term": map[string]any{"service.name": "my-svc"}},
+			map[string]any{"term": map[string]any{"service.name": "payment-service"}},
 			map[string]any{"range": map[string]any{"@timestamp": map[string]any{
 				"gte": "2024-01-01T00:00:00.000Z",
 				"lte": "2024-01-02T00:00:00.000Z",
@@ -159,16 +182,19 @@ func TestTraceSearch_Success(t *testing.T) {
 		assert.Equal(t, []any{map[string]any{"@timestamp": "desc"}}, eseBody["sort"])
 		assert.Equal(t, float64(50), eseBody["size"])
 
-		cannedEseResponse(w, map[string]any{"trace": map[string]any{"id": "t1"}})
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(logDocEnvelope)
 	})
 
 	results, err := client.TraceSearch(context.Background(), TraceSearchParams{
-		Service: "my-svc",
+		Service: "payment-service",
 		Start:   "2024-01-01T00:00:00.000Z",
 		End:     "2024-01-02T00:00:00.000Z",
 	})
 	require.NoError(t, err)
 	require.Len(t, results, 1)
+	traceVal := results[0]["trace"].(map[string]any)
+	assert.Equal(t, "traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa", traceVal["id"])
 }
 
 func TestTraceSearch_Failure(t *testing.T) {
@@ -182,19 +208,22 @@ func TestTraceSearch_Failure(t *testing.T) {
 }
 
 func TestRawSearch_Success(t *testing.T) {
+	logDocEnvelope := eseEnvelopeFromFixture(t, "testdata/log_doc.json")
+
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/internal/search/ese", r.URL.Path)
 		body := decodeEseRequest(t, r)
 		params := body["params"].(map[string]any)
 		assert.Equal(t, "my-index*", params["index"])
 
-		cannedEseResponse(w, map[string]any{"field": "value"})
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write(logDocEnvelope)
 	})
 
 	results, err := client.RawSearch(context.Background(), "my-index*", map[string]any{"query": map[string]any{"match_all": map[string]any{}}})
 	require.NoError(t, err)
 	require.Len(t, results, 1)
-	assert.Equal(t, "value", results[0]["field"])
+	assert.Equal(t, "processing checkout", results[0]["message"])
 }
 
 func TestRawSearch_Failure(t *testing.T) {

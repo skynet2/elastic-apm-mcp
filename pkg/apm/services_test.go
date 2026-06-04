@@ -2,8 +2,8 @@ package apm
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,13 +12,12 @@ import (
 
 func TestServiceList_Success(t *testing.T) {
 	tests := []struct {
-		name        string
-		params      ServiceListParams
-		wantEnv     string
-		wantKuery   string
-		wantStart   string
-		wantEnd     string
-		wantSvcName string
+		name      string
+		params    ServiceListParams
+		wantEnv   string
+		wantKuery string
+		wantStart string
+		wantEnd   string
 	}{
 		{
 			name: "explicit environment",
@@ -28,11 +27,10 @@ func TestServiceList_Success(t *testing.T) {
 				Start:       "2024-01-01T00:00:00.000Z",
 				End:         "2024-01-02T00:00:00.000Z",
 			},
-			wantEnv:     "production",
-			wantKuery:   "service.name:foo",
-			wantStart:   "2024-01-01T00:00:00.000Z",
-			wantEnd:     "2024-01-02T00:00:00.000Z",
-			wantSvcName: "my-service",
+			wantEnv:   "production",
+			wantKuery: "service.name:foo",
+			wantStart: "2024-01-01T00:00:00.000Z",
+			wantEnd:   "2024-01-02T00:00:00.000Z",
 		},
 		{
 			name: "empty environment defaults",
@@ -40,13 +38,15 @@ func TestServiceList_Success(t *testing.T) {
 				Start: "2024-01-01T00:00:00.000Z",
 				End:   "2024-01-02T00:00:00.000Z",
 			},
-			wantEnv:     "ENVIRONMENT_ALL",
-			wantKuery:   "",
-			wantStart:   "2024-01-01T00:00:00.000Z",
-			wantEnd:     "2024-01-02T00:00:00.000Z",
-			wantSvcName: "my-service",
+			wantEnv:   "ENVIRONMENT_ALL",
+			wantKuery: "",
+			wantStart: "2024-01-01T00:00:00.000Z",
+			wantEnd:   "2024-01-02T00:00:00.000Z",
 		},
 	}
+
+	data, err := os.ReadFile("testdata/services.json")
+	require.NoError(t, err)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -62,25 +62,13 @@ func TestServiceList_Success(t *testing.T) {
 				assert.Equal(t, "1", r.URL.Query().Get("probability"))
 
 				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(map[string]any{
-					"items": []any{
-						map[string]any{
-							"serviceName":          "my-service",
-							"agentName":            "go",
-							"environments":         []string{"production"},
-							"latency":              1.5,
-							"throughput":           100.0,
-							"transactionErrorRate": 0.01,
-							"transactionType":      "request",
-						},
-					},
-				})
+				_, _ = w.Write(data)
 			})
 
 			svcs, err := client.ServiceList(context.Background(), tt.params)
 			require.NoError(t, err)
 			require.Len(t, svcs, 1)
-			assert.Equal(t, tt.wantSvcName, svcs[0].ServiceName)
+			assert.Equal(t, "payment-service", svcs[0].ServiceName)
 			assert.Equal(t, "go", svcs[0].AgentName)
 		})
 	}

@@ -1,0 +1,1 @@
+{"transaction":"traces-apm*,apm-*,traces-*.otel-*","span":"traces-apm*,apm-*,traces-*.otel-*","error":"logs-apm*,apm-*,logs-*.otel-*","metric":"metrics-apm*,apm-*,metrics-*.otel-*","onboarding":"apm-*","sourcemap":"apm-*"}

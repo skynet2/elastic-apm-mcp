@@ -2,8 +2,8 @@ package apm
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,6 +45,9 @@ func TestTransactionGroups_Success(t *testing.T) {
 		},
 	}
 
+	data, err := os.ReadFile("testdata/transaction_groups.json")
+	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
@@ -57,25 +60,13 @@ func TestTransactionGroups_Success(t *testing.T) {
 				assert.Equal(t, "true", r.URL.Query().Get("useDurationSummary"))
 
 				w.Header().Set("Content-Type", "application/json")
-				_ = json.NewEncoder(w).Encode(map[string]any{
-					"transactionGroups": []any{
-						map[string]any{
-							"name":            "GET /api",
-							"latency":         1.5,
-							"throughput":      100.0,
-							"errorRate":       0.01,
-							"impact":          50.0,
-							"alertsCount":     0,
-							"transactionType": "request",
-						},
-					},
-				})
+				_, _ = w.Write(data)
 			})
 
 			groups, err := client.TransactionGroups(context.Background(), tt.params)
 			require.NoError(t, err)
 			require.Len(t, groups, 1)
-			assert.Equal(t, "GET /api", groups[0].Name)
+			assert.Equal(t, "GET /checkout", groups[0].Name)
 		})
 	}
 }
@@ -92,6 +83,9 @@ func TestTransactionGroups_Failure(t *testing.T) {
 }
 
 func TestTransactionSamples_Success(t *testing.T) {
+	data, err := os.ReadFile("testdata/transaction_samples.json")
+	require.NoError(t, err)
+
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "/internal/apm/services/my-svc/transactions/traces/samples", r.URL.Path)
 		assert.Equal(t, "production", r.URL.Query().Get("environment"))
@@ -99,16 +93,7 @@ func TestTransactionSamples_Success(t *testing.T) {
 		assert.Equal(t, "GET /api", r.URL.Query().Get("transactionName"))
 
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]any{
-			"traceSamples": []any{
-				map[string]any{
-					"score":         1.0,
-					"timestamp":     "2024-01-01T00:00:00.000Z",
-					"traceId":       "trace-123",
-					"transactionId": "tx-456",
-				},
-			},
-		})
+		_, _ = w.Write(data)
 	})
 
 	samples, err := client.TransactionSamples(context.Background(), TransactionSamplesParams{
@@ -121,8 +106,8 @@ func TestTransactionSamples_Success(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Len(t, samples, 1)
-	assert.Equal(t, "trace-123", samples[0].TraceID)
-	assert.Equal(t, "tx-456", samples[0].TransactionID)
+	assert.Equal(t, "traceaaaaaaaaaaaaaaaaaaaaaaaaaaaa", samples[0].TraceID)
+	assert.Equal(t, "txn0000000000001", samples[0].TransactionID)
 }
 
 func TestTransactionSamples_Failure(t *testing.T) {
