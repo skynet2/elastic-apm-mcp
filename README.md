@@ -57,10 +57,15 @@ All keys can be overridden with env vars prefixed `APM_`:
 |---|---|
 | `APM_URL` | `url` |
 | `APM_API_KEY` | `api_key` |
+| `APM_HEADERS` | `headers` |
 | `APM_TIMEOUT` | `timeout` |
 | `APM_LOG_LEVEL` | `log_level` |
 
-> `headers` cannot be set via env vars — configure them in the YAML file.
+`APM_HEADERS` is a comma-separated list of `Name=Value` pairs, e.g.
+`APM_HEADERS=CF-Access-Client-Id=<id>,CF-Access-Client-Secret=<secret>`.
+Env headers merge over (and override) any `headers` from the YAML file, so the
+server can be configured entirely from the environment — useful for MCP client
+`env` blocks.
 
 ### Creating a Kibana API key
 
