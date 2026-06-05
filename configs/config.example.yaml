@@ -1,0 +1,7 @@
+url: https://kibana.example.com
+api_key: your-base64-kibana-api-key
+headers:
+  CF-Access-Client-Id: your-cf-client-id
+  CF-Access-Client-Secret: your-cf-client-secret
+timeout: 30s
+log_level: info

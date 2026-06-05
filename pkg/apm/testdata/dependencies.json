@@ -1,0 +1,1 @@
+{"serviceDependencies":[{"id":"dep0000000000001","location":{"dependencyName":"api.example.com:443","spanType":"external","spanSubtype":"http","type":"dependency","id":"dep0000000000001"},"currentStats":{"impact":2.58,"latency":{"value":522329.72,"timeseries":[{"x":1780601520000,"y":1.0}]}},"previousStats":{"impact":1.16,"latency":{"value":253889.86,"timeseries":[]}}}]}

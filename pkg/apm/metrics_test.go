@@ -1,0 +1,120 @@
+package apm
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"os"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestServiceMetrics_Success(t *testing.T) {
+	latencyData, err := os.ReadFile("testdata/metrics_latency.json")
+	require.NoError(t, err)
+
+	tests := []struct {
+		name         string
+		metric       string
+		wantPath     string
+		wantTxType   string
+		wantDocType  string
+		wantLatAgg   string
+		responseBody []byte
+	}{
+		{
+			name:         "latency",
+			metric:       "latency",
+			wantPath:     "/internal/apm/services/my-svc/transactions/charts/latency",
+			wantTxType:   "request",
+			wantDocType:  "transactionMetric",
+			wantLatAgg:   "avg",
+			responseBody: latencyData,
+		},
+		{
+			name:        "throughput",
+			metric:      "throughput",
+			wantPath:    "/internal/apm/services/my-svc/throughput",
+			wantTxType:  "request",
+			wantDocType: "transactionMetric",
+			wantLatAgg:  "",
+		},
+		{
+			name:        "error_rate",
+			metric:      "error_rate",
+			wantPath:    "/internal/apm/services/my-svc/transactions/charts/error_rate",
+			wantTxType:  "request",
+			wantDocType: "transactionMetric",
+			wantLatAgg:  "",
+		},
+		{
+			name:        "breakdown",
+			metric:      "breakdown",
+			wantPath:    "/internal/apm/services/my-svc/transaction/charts/breakdown",
+			wantTxType:  "request",
+			wantDocType: "",
+			wantLatAgg:  "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+				assert.Equal(t, tt.wantPath, r.URL.Path)
+				assert.Equal(t, tt.wantTxType, r.URL.Query().Get("transactionType"))
+				assert.Equal(t, tt.wantDocType, r.URL.Query().Get("documentType"))
+				assert.Equal(t, tt.wantLatAgg, r.URL.Query().Get("latencyAggregationType"))
+				assert.Equal(t, "production", r.URL.Query().Get("environment"))
+				w.Header().Set("Content-Type", "application/json")
+				if len(tt.responseBody) > 0 {
+					_, _ = w.Write(tt.responseBody)
+				} else {
+					_ = json.NewEncoder(w).Encode(map[string]any{})
+				}
+			})
+
+			result, err := client.ServiceMetrics(context.Background(), ServiceMetricsParams{
+				Service:         "my-svc",
+				Metric:          tt.metric,
+				Environment:     "production",
+				Start:           "2024-01-01T00:00:00.000Z",
+				End:             "2024-01-02T00:00:00.000Z",
+				TransactionType: "request",
+			})
+			require.NoError(t, err)
+			assert.NotNil(t, result)
+		})
+	}
+}
+
+func TestServiceMetrics_Failure(t *testing.T) {
+	t.Run("unsupported metric", func(t *testing.T) {
+		client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+			t.Fatal("no HTTP call expected for unsupported metric")
+		})
+
+		_, err := client.ServiceMetrics(context.Background(), ServiceMetricsParams{
+			Service: "my-svc",
+			Metric:  "unknown",
+		})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "unsupported metric")
+		assert.Contains(t, err.Error(), "unknown")
+	})
+
+	t.Run("http 500", func(t *testing.T) {
+		client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("boom"))
+		})
+
+		_, err := client.ServiceMetrics(context.Background(), ServiceMetricsParams{
+			Service: "my-svc",
+			Metric:  "latency",
+		})
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "service metrics")
+	})
+}

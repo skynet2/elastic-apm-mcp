@@ -1,0 +1,1 @@
+{"items":[{"serviceName":"payment-service","agentName":"go","environments":["prod"],"latency":20317.6,"throughput":1456,"transactionErrorRate":0.0012,"transactionType":"request"}],"maxCountExceeded":false}
