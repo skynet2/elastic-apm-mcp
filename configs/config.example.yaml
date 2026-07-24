@@ -5,3 +5,4 @@ headers:
   CF-Access-Client-Secret: your-cf-client-secret
 timeout: 30s
 log_level: info
+app_logs_index: fluent-bit-*   # Index pattern for application/container stdout logs (default: fluent-bit-*)
