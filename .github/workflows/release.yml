@@ -32,12 +32,9 @@ jobs:
           go-version: stable
           cache: true
 
-      - name: Generate mocks
-        run: |
-          go install github.com/golang/mock/mockgen@v1.6.0
-          go generate ./...
-
       # Gate the release on the test suite so a broken master never ships a tag.
+      # Mocks are committed; regenerating here would dirty the tree and make
+      # GoReleaser refuse to release.
       - name: Test
         run: make test
 
