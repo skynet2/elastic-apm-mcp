@@ -2,11 +2,20 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      custom_tag:
+        description: "Force a specific version (e.g. v1.2.3). Blank = auto from conventional commits."
+        required: false
+        default: ""
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -28,7 +37,26 @@ jobs:
           go install github.com/golang/mock/mockgen@v1.6.0
           go generate ./...
 
+      # Gate the release on the test suite so a broken master never ships a tag.
+      - name: Test
+        run: make test
+
+      - name: Bump version and tag
+        id: tag
+        uses: mathieudutour/github-tag-action@a22cf08638b34d5badda920f9daf6e72c477b07b ## v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: master
+          default_bump: patch
+          fetch_all_tags: true
+          custom_tag: ${{ github.event.inputs.custom_tag }}
+
+      - name: Fetch new tag locally
+        if: steps.tag.outputs.new_tag
+        run: git fetch --tags --force
+
       - name: Run GoReleaser
+        if: steps.tag.outputs.new_tag
         uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 ## v7.0.0
         with:
           distribution: goreleaser
@@ -36,3 +64,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.new_tag }}

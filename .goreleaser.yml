@@ -12,6 +12,13 @@ builds:
     goarch:
       - amd64
       - arm64
+    # Ship linux/amd64, darwin/amd64, darwin/arm64, windows/amd64.
+    # Drop linux/arm64 and windows/arm64.
+    ignore:
+      - goos: linux
+        goarch: arm64
+      - goos: windows
+        goarch: arm64
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
@@ -19,9 +26,10 @@ builds:
       - -s -w
 
 archives:
-  - format_overrides:
+  - formats: [tar.gz]
+    format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 checksum:
   name_template: "checksums.txt"
