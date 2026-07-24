@@ -141,7 +141,7 @@ func TestESSearchHandler_Success(t *testing.T) {
 		args     map[string]any
 		index    string
 		body     map[string]any
-		response []map[string]any
+		response apm.SearchResult
 		wantJSON string
 	}{
 		{
@@ -156,8 +156,11 @@ func TestESSearchHandler_Success(t *testing.T) {
 			body: map[string]any{
 				"query": map[string]any{"match_all": map[string]any{}},
 			},
-			response: []map[string]any{{"_id": "doc1"}},
-			wantJSON: `"_id"`,
+			response: apm.SearchResult{
+				Total: 1,
+				Hits:  []map[string]any{{"_id": "doc1", "_index": "traces-apm-000001"}},
+			},
+			wantJSON: `"_index"`,
 		},
 	}
 
@@ -206,7 +209,7 @@ func TestESSearchHandler_Failure(t *testing.T) {
 			},
 			setupMock: func(m *mocks.MockAPMClient) {
 				m.EXPECT().RawSearch(gomock.Any(), "traces-apm*", map[string]any{"query": map[string]any{}}).
-					Return(nil, errors.New("es fail"))
+					Return(apm.SearchResult{}, errors.New("es fail"))
 			},
 			errContains: "es fail",
 		},

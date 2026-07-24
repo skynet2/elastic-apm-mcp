@@ -222,8 +222,8 @@ func TestRawSearch_Success(t *testing.T) {
 
 	results, err := client.RawSearch(context.Background(), "my-index*", map[string]any{"query": map[string]any{"match_all": map[string]any{}}})
 	require.NoError(t, err)
-	require.Len(t, results, 1)
-	assert.Equal(t, "processing checkout", results[0]["message"])
+	require.Len(t, results.Hits, 1)
+	assert.Equal(t, "processing checkout", results.Hits[0]["message"])
 }
 
 func TestRawSearch_Failure(t *testing.T) {

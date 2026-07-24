@@ -35,6 +35,123 @@ func (m *MockAPMClient) EXPECT() *MockAPMClientMockRecorder {
 	return m.recorder
 }
 
+// AppLogsSearch mocks base method.
+func (m *MockAPMClient) AppLogsSearch(ctx context.Context, p apm.AppLogsParams) ([]map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AppLogsSearch", ctx, p)
+	ret0, _ := ret[0].([]map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AppLogsSearch indicates an expected call of AppLogsSearch.
+func (mr *MockAPMClientMockRecorder) AppLogsSearch(ctx, p interface{}) *APMClientAppLogsSearchCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppLogsSearch", reflect.TypeOf((*MockAPMClient)(nil).AppLogsSearch), ctx, p)
+	return &APMClientAppLogsSearchCall{Call: call}
+}
+
+// APMClientAppLogsSearchCall wrap *gomock.Call
+type APMClientAppLogsSearchCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientAppLogsSearchCall) Return(arg0 []map[string]any, arg1 error) *APMClientAppLogsSearchCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientAppLogsSearchCall) Do(f func(context.Context, apm.AppLogsParams) ([]map[string]any, error)) *APMClientAppLogsSearchCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientAppLogsSearchCall) DoAndReturn(f func(context.Context, apm.AppLogsParams) ([]map[string]any, error)) *APMClientAppLogsSearchCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// DescribeFields mocks base method.
+func (m *MockAPMClient) DescribeFields(ctx context.Context, pattern string) ([]apm.Field, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DescribeFields", ctx, pattern)
+	ret0, _ := ret[0].([]apm.Field)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DescribeFields indicates an expected call of DescribeFields.
+func (mr *MockAPMClientMockRecorder) DescribeFields(ctx, pattern interface{}) *APMClientDescribeFieldsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeFields", reflect.TypeOf((*MockAPMClient)(nil).DescribeFields), ctx, pattern)
+	return &APMClientDescribeFieldsCall{Call: call}
+}
+
+// APMClientDescribeFieldsCall wrap *gomock.Call
+type APMClientDescribeFieldsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientDescribeFieldsCall) Return(arg0 []apm.Field, arg1 error) *APMClientDescribeFieldsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientDescribeFieldsCall) Do(f func(context.Context, string) ([]apm.Field, error)) *APMClientDescribeFieldsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientDescribeFieldsCall) DoAndReturn(f func(context.Context, string) ([]apm.Field, error)) *APMClientDescribeFieldsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ESQL mocks base method.
+func (m *MockAPMClient) ESQL(ctx context.Context, query string) (apm.ESQLResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ESQL", ctx, query)
+	ret0, _ := ret[0].(apm.ESQLResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ESQL indicates an expected call of ESQL.
+func (mr *MockAPMClientMockRecorder) ESQL(ctx, query interface{}) *APMClientESQLCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ESQL", reflect.TypeOf((*MockAPMClient)(nil).ESQL), ctx, query)
+	return &APMClientESQLCall{Call: call}
+}
+
+// APMClientESQLCall wrap *gomock.Call
+type APMClientESQLCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientESQLCall) Return(arg0 apm.ESQLResult, arg1 error) *APMClientESQLCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientESQLCall) Do(f func(context.Context, string) (apm.ESQLResult, error)) *APMClientESQLCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientESQLCall) DoAndReturn(f func(context.Context, string) (apm.ESQLResult, error)) *APMClientESQLCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
 // Environments mocks base method.
 func (m *MockAPMClient) Environments(ctx context.Context, start, end string) ([]string, error) {
 	m.ctrl.T.Helper()
@@ -45,9 +162,33 @@ func (m *MockAPMClient) Environments(ctx context.Context, start, end string) ([]
 }
 
 // Environments indicates an expected call of Environments.
-func (mr *MockAPMClientMockRecorder) Environments(ctx, start, end interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) Environments(ctx, start, end interface{}) *APMClientEnvironmentsCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Environments", reflect.TypeOf((*MockAPMClient)(nil).Environments), ctx, start, end)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Environments", reflect.TypeOf((*MockAPMClient)(nil).Environments), ctx, start, end)
+	return &APMClientEnvironmentsCall{Call: call}
+}
+
+// APMClientEnvironmentsCall wrap *gomock.Call
+type APMClientEnvironmentsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientEnvironmentsCall) Return(arg0 []string, arg1 error) *APMClientEnvironmentsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientEnvironmentsCall) Do(f func(context.Context, string, string) ([]string, error)) *APMClientEnvironmentsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientEnvironmentsCall) DoAndReturn(f func(context.Context, string, string) ([]string, error)) *APMClientEnvironmentsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ErrorGet mocks base method.
@@ -60,9 +201,33 @@ func (m *MockAPMClient) ErrorGet(ctx context.Context, p apm.ErrorGetParams) ([]m
 }
 
 // ErrorGet indicates an expected call of ErrorGet.
-func (mr *MockAPMClientMockRecorder) ErrorGet(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) ErrorGet(ctx, p interface{}) *APMClientErrorGetCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ErrorGet", reflect.TypeOf((*MockAPMClient)(nil).ErrorGet), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ErrorGet", reflect.TypeOf((*MockAPMClient)(nil).ErrorGet), ctx, p)
+	return &APMClientErrorGetCall{Call: call}
+}
+
+// APMClientErrorGetCall wrap *gomock.Call
+type APMClientErrorGetCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientErrorGetCall) Return(arg0 []map[string]any, arg1 error) *APMClientErrorGetCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientErrorGetCall) Do(f func(context.Context, apm.ErrorGetParams) ([]map[string]any, error)) *APMClientErrorGetCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientErrorGetCall) DoAndReturn(f func(context.Context, apm.ErrorGetParams) ([]map[string]any, error)) *APMClientErrorGetCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ErrorGroups mocks base method.
@@ -75,9 +240,33 @@ func (m *MockAPMClient) ErrorGroups(ctx context.Context, p apm.ErrorGroupsParams
 }
 
 // ErrorGroups indicates an expected call of ErrorGroups.
-func (mr *MockAPMClientMockRecorder) ErrorGroups(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) ErrorGroups(ctx, p interface{}) *APMClientErrorGroupsCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ErrorGroups", reflect.TypeOf((*MockAPMClient)(nil).ErrorGroups), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ErrorGroups", reflect.TypeOf((*MockAPMClient)(nil).ErrorGroups), ctx, p)
+	return &APMClientErrorGroupsCall{Call: call}
+}
+
+// APMClientErrorGroupsCall wrap *gomock.Call
+type APMClientErrorGroupsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientErrorGroupsCall) Return(arg0 map[string]any, arg1 error) *APMClientErrorGroupsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientErrorGroupsCall) Do(f func(context.Context, apm.ErrorGroupsParams) (map[string]any, error)) *APMClientErrorGroupsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientErrorGroupsCall) DoAndReturn(f func(context.Context, apm.ErrorGroupsParams) (map[string]any, error)) *APMClientErrorGroupsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // GetAPMIndices mocks base method.
@@ -90,9 +279,72 @@ func (m *MockAPMClient) GetAPMIndices(ctx context.Context) (apm.APMIndices, erro
 }
 
 // GetAPMIndices indicates an expected call of GetAPMIndices.
-func (mr *MockAPMClientMockRecorder) GetAPMIndices(ctx interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) GetAPMIndices(ctx interface{}) *APMClientGetAPMIndicesCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAPMIndices", reflect.TypeOf((*MockAPMClient)(nil).GetAPMIndices), ctx)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAPMIndices", reflect.TypeOf((*MockAPMClient)(nil).GetAPMIndices), ctx)
+	return &APMClientGetAPMIndicesCall{Call: call}
+}
+
+// APMClientGetAPMIndicesCall wrap *gomock.Call
+type APMClientGetAPMIndicesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientGetAPMIndicesCall) Return(arg0 apm.APMIndices, arg1 error) *APMClientGetAPMIndicesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientGetAPMIndicesCall) Do(f func(context.Context) (apm.APMIndices, error)) *APMClientGetAPMIndicesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientGetAPMIndicesCall) DoAndReturn(f func(context.Context) (apm.APMIndices, error)) *APMClientGetAPMIndicesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// ListIndices mocks base method.
+func (m *MockAPMClient) ListIndices(ctx context.Context, pattern string) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListIndices", ctx, pattern)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListIndices indicates an expected call of ListIndices.
+func (mr *MockAPMClientMockRecorder) ListIndices(ctx, pattern interface{}) *APMClientListIndicesCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListIndices", reflect.TypeOf((*MockAPMClient)(nil).ListIndices), ctx, pattern)
+	return &APMClientListIndicesCall{Call: call}
+}
+
+// APMClientListIndicesCall wrap *gomock.Call
+type APMClientListIndicesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientListIndicesCall) Return(arg0 []string, arg1 error) *APMClientListIndicesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientListIndicesCall) Do(f func(context.Context, string) ([]string, error)) *APMClientListIndicesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientListIndicesCall) DoAndReturn(f func(context.Context, string) ([]string, error)) *APMClientListIndicesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // LogsSearch mocks base method.
@@ -105,24 +357,72 @@ func (m *MockAPMClient) LogsSearch(ctx context.Context, p apm.LogsParams) ([]map
 }
 
 // LogsSearch indicates an expected call of LogsSearch.
-func (mr *MockAPMClientMockRecorder) LogsSearch(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) LogsSearch(ctx, p interface{}) *APMClientLogsSearchCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogsSearch", reflect.TypeOf((*MockAPMClient)(nil).LogsSearch), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogsSearch", reflect.TypeOf((*MockAPMClient)(nil).LogsSearch), ctx, p)
+	return &APMClientLogsSearchCall{Call: call}
+}
+
+// APMClientLogsSearchCall wrap *gomock.Call
+type APMClientLogsSearchCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientLogsSearchCall) Return(arg0 []map[string]any, arg1 error) *APMClientLogsSearchCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientLogsSearchCall) Do(f func(context.Context, apm.LogsParams) ([]map[string]any, error)) *APMClientLogsSearchCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientLogsSearchCall) DoAndReturn(f func(context.Context, apm.LogsParams) ([]map[string]any, error)) *APMClientLogsSearchCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // RawSearch mocks base method.
-func (m *MockAPMClient) RawSearch(ctx context.Context, index string, body map[string]any) ([]map[string]any, error) {
+func (m *MockAPMClient) RawSearch(ctx context.Context, index string, body map[string]any) (apm.SearchResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RawSearch", ctx, index, body)
-	ret0, _ := ret[0].([]map[string]any)
+	ret0, _ := ret[0].(apm.SearchResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RawSearch indicates an expected call of RawSearch.
-func (mr *MockAPMClientMockRecorder) RawSearch(ctx, index, body interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) RawSearch(ctx, index, body interface{}) *APMClientRawSearchCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RawSearch", reflect.TypeOf((*MockAPMClient)(nil).RawSearch), ctx, index, body)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RawSearch", reflect.TypeOf((*MockAPMClient)(nil).RawSearch), ctx, index, body)
+	return &APMClientRawSearchCall{Call: call}
+}
+
+// APMClientRawSearchCall wrap *gomock.Call
+type APMClientRawSearchCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientRawSearchCall) Return(arg0 apm.SearchResult, arg1 error) *APMClientRawSearchCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientRawSearchCall) Do(f func(context.Context, string, map[string]any) (apm.SearchResult, error)) *APMClientRawSearchCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientRawSearchCall) DoAndReturn(f func(context.Context, string, map[string]any) (apm.SearchResult, error)) *APMClientRawSearchCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ServiceDependencies mocks base method.
@@ -135,9 +435,33 @@ func (m *MockAPMClient) ServiceDependencies(ctx context.Context, p apm.Dependenc
 }
 
 // ServiceDependencies indicates an expected call of ServiceDependencies.
-func (mr *MockAPMClientMockRecorder) ServiceDependencies(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) ServiceDependencies(ctx, p interface{}) *APMClientServiceDependenciesCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceDependencies", reflect.TypeOf((*MockAPMClient)(nil).ServiceDependencies), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceDependencies", reflect.TypeOf((*MockAPMClient)(nil).ServiceDependencies), ctx, p)
+	return &APMClientServiceDependenciesCall{Call: call}
+}
+
+// APMClientServiceDependenciesCall wrap *gomock.Call
+type APMClientServiceDependenciesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientServiceDependenciesCall) Return(arg0 []apm.ServiceDependency, arg1 error) *APMClientServiceDependenciesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientServiceDependenciesCall) Do(f func(context.Context, apm.DependenciesParams) ([]apm.ServiceDependency, error)) *APMClientServiceDependenciesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientServiceDependenciesCall) DoAndReturn(f func(context.Context, apm.DependenciesParams) ([]apm.ServiceDependency, error)) *APMClientServiceDependenciesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ServiceList mocks base method.
@@ -150,9 +474,33 @@ func (m *MockAPMClient) ServiceList(ctx context.Context, p apm.ServiceListParams
 }
 
 // ServiceList indicates an expected call of ServiceList.
-func (mr *MockAPMClientMockRecorder) ServiceList(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) ServiceList(ctx, p interface{}) *APMClientServiceListCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceList", reflect.TypeOf((*MockAPMClient)(nil).ServiceList), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceList", reflect.TypeOf((*MockAPMClient)(nil).ServiceList), ctx, p)
+	return &APMClientServiceListCall{Call: call}
+}
+
+// APMClientServiceListCall wrap *gomock.Call
+type APMClientServiceListCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientServiceListCall) Return(arg0 []apm.Service, arg1 error) *APMClientServiceListCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientServiceListCall) Do(f func(context.Context, apm.ServiceListParams) ([]apm.Service, error)) *APMClientServiceListCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientServiceListCall) DoAndReturn(f func(context.Context, apm.ServiceListParams) ([]apm.Service, error)) *APMClientServiceListCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // ServiceMetrics mocks base method.
@@ -165,9 +513,33 @@ func (m *MockAPMClient) ServiceMetrics(ctx context.Context, p apm.ServiceMetrics
 }
 
 // ServiceMetrics indicates an expected call of ServiceMetrics.
-func (mr *MockAPMClientMockRecorder) ServiceMetrics(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) ServiceMetrics(ctx, p interface{}) *APMClientServiceMetricsCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceMetrics", reflect.TypeOf((*MockAPMClient)(nil).ServiceMetrics), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceMetrics", reflect.TypeOf((*MockAPMClient)(nil).ServiceMetrics), ctx, p)
+	return &APMClientServiceMetricsCall{Call: call}
+}
+
+// APMClientServiceMetricsCall wrap *gomock.Call
+type APMClientServiceMetricsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientServiceMetricsCall) Return(arg0 map[string]any, arg1 error) *APMClientServiceMetricsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientServiceMetricsCall) Do(f func(context.Context, apm.ServiceMetricsParams) (map[string]any, error)) *APMClientServiceMetricsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientServiceMetricsCall) DoAndReturn(f func(context.Context, apm.ServiceMetricsParams) (map[string]any, error)) *APMClientServiceMetricsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // TraceGet mocks base method.
@@ -180,9 +552,72 @@ func (m *MockAPMClient) TraceGet(ctx context.Context, traceID string, p apm.Trac
 }
 
 // TraceGet indicates an expected call of TraceGet.
-func (mr *MockAPMClientMockRecorder) TraceGet(ctx, traceID, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) TraceGet(ctx, traceID, p interface{}) *APMClientTraceGetCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceGet", reflect.TypeOf((*MockAPMClient)(nil).TraceGet), ctx, traceID, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceGet", reflect.TypeOf((*MockAPMClient)(nil).TraceGet), ctx, traceID, p)
+	return &APMClientTraceGetCall{Call: call}
+}
+
+// APMClientTraceGetCall wrap *gomock.Call
+type APMClientTraceGetCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientTraceGetCall) Return(arg0 apm.Trace, arg1 error) *APMClientTraceGetCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientTraceGetCall) Do(f func(context.Context, string, apm.TraceParams) (apm.Trace, error)) *APMClientTraceGetCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientTraceGetCall) DoAndReturn(f func(context.Context, string, apm.TraceParams) (apm.Trace, error)) *APMClientTraceGetCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
+}
+
+// TraceLogs mocks base method.
+func (m *MockAPMClient) TraceLogs(ctx context.Context, p apm.TraceLogsParams) ([]map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TraceLogs", ctx, p)
+	ret0, _ := ret[0].([]map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TraceLogs indicates an expected call of TraceLogs.
+func (mr *MockAPMClientMockRecorder) TraceLogs(ctx, p interface{}) *APMClientTraceLogsCall {
+	mr.mock.ctrl.T.Helper()
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceLogs", reflect.TypeOf((*MockAPMClient)(nil).TraceLogs), ctx, p)
+	return &APMClientTraceLogsCall{Call: call}
+}
+
+// APMClientTraceLogsCall wrap *gomock.Call
+type APMClientTraceLogsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientTraceLogsCall) Return(arg0 []map[string]any, arg1 error) *APMClientTraceLogsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientTraceLogsCall) Do(f func(context.Context, apm.TraceLogsParams) ([]map[string]any, error)) *APMClientTraceLogsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientTraceLogsCall) DoAndReturn(f func(context.Context, apm.TraceLogsParams) ([]map[string]any, error)) *APMClientTraceLogsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // TraceSearch mocks base method.
@@ -195,9 +630,33 @@ func (m *MockAPMClient) TraceSearch(ctx context.Context, p apm.TraceSearchParams
 }
 
 // TraceSearch indicates an expected call of TraceSearch.
-func (mr *MockAPMClientMockRecorder) TraceSearch(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) TraceSearch(ctx, p interface{}) *APMClientTraceSearchCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceSearch", reflect.TypeOf((*MockAPMClient)(nil).TraceSearch), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TraceSearch", reflect.TypeOf((*MockAPMClient)(nil).TraceSearch), ctx, p)
+	return &APMClientTraceSearchCall{Call: call}
+}
+
+// APMClientTraceSearchCall wrap *gomock.Call
+type APMClientTraceSearchCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientTraceSearchCall) Return(arg0 []map[string]any, arg1 error) *APMClientTraceSearchCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientTraceSearchCall) Do(f func(context.Context, apm.TraceSearchParams) ([]map[string]any, error)) *APMClientTraceSearchCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientTraceSearchCall) DoAndReturn(f func(context.Context, apm.TraceSearchParams) ([]map[string]any, error)) *APMClientTraceSearchCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // TransactionGroups mocks base method.
@@ -210,9 +669,33 @@ func (m *MockAPMClient) TransactionGroups(ctx context.Context, p apm.Transaction
 }
 
 // TransactionGroups indicates an expected call of TransactionGroups.
-func (mr *MockAPMClientMockRecorder) TransactionGroups(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) TransactionGroups(ctx, p interface{}) *APMClientTransactionGroupsCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransactionGroups", reflect.TypeOf((*MockAPMClient)(nil).TransactionGroups), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransactionGroups", reflect.TypeOf((*MockAPMClient)(nil).TransactionGroups), ctx, p)
+	return &APMClientTransactionGroupsCall{Call: call}
+}
+
+// APMClientTransactionGroupsCall wrap *gomock.Call
+type APMClientTransactionGroupsCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientTransactionGroupsCall) Return(arg0 []apm.TransactionGroup, arg1 error) *APMClientTransactionGroupsCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientTransactionGroupsCall) Do(f func(context.Context, apm.TransactionGroupsParams) ([]apm.TransactionGroup, error)) *APMClientTransactionGroupsCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientTransactionGroupsCall) DoAndReturn(f func(context.Context, apm.TransactionGroupsParams) ([]apm.TransactionGroup, error)) *APMClientTransactionGroupsCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }
 
 // TransactionSamples mocks base method.
@@ -225,7 +708,31 @@ func (m *MockAPMClient) TransactionSamples(ctx context.Context, p apm.Transactio
 }
 
 // TransactionSamples indicates an expected call of TransactionSamples.
-func (mr *MockAPMClientMockRecorder) TransactionSamples(ctx, p interface{}) *gomock.Call {
+func (mr *MockAPMClientMockRecorder) TransactionSamples(ctx, p interface{}) *APMClientTransactionSamplesCall {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransactionSamples", reflect.TypeOf((*MockAPMClient)(nil).TransactionSamples), ctx, p)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransactionSamples", reflect.TypeOf((*MockAPMClient)(nil).TransactionSamples), ctx, p)
+	return &APMClientTransactionSamplesCall{Call: call}
+}
+
+// APMClientTransactionSamplesCall wrap *gomock.Call
+type APMClientTransactionSamplesCall struct {
+	*gomock.Call
+}
+
+// Return rewrite *gomock.Call.Return
+func (c *APMClientTransactionSamplesCall) Return(arg0 []apm.TraceSample, arg1 error) *APMClientTransactionSamplesCall {
+	c.Call = c.Call.Return(arg0, arg1)
+	return c
+}
+
+// Do rewrite *gomock.Call.Do
+func (c *APMClientTransactionSamplesCall) Do(f func(context.Context, apm.TransactionSamplesParams) ([]apm.TraceSample, error)) *APMClientTransactionSamplesCall {
+	c.Call = c.Call.Do(f)
+	return c
+}
+
+// DoAndReturn rewrite *gomock.Call.DoAndReturn
+func (c *APMClientTransactionSamplesCall) DoAndReturn(f func(context.Context, apm.TransactionSamplesParams) ([]apm.TraceSample, error)) *APMClientTransactionSamplesCall {
+	c.Call = c.Call.DoAndReturn(f)
+	return c
 }

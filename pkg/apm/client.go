@@ -14,18 +14,22 @@ import (
 
 const elasticAPIVersion = "2023-10-31"
 
+const defaultAppLogsIndex = "fluent-bit-*"
+
 type Config struct {
-	BaseURL    string
-	APIKey     string
-	Headers    map[string]string
-	HTTPClient *http.Client
+	BaseURL      string
+	APIKey       string
+	Headers      map[string]string
+	HTTPClient   *http.Client
+	AppLogsIndex string
 }
 
 type Client struct {
-	baseURL    string
-	apiKey     string
-	headers    map[string]string
-	httpClient *http.Client
+	baseURL      string
+	apiKey       string
+	headers      map[string]string
+	httpClient   *http.Client
+	appLogsIndex string
 }
 
 func New(cfg Config) *Client {
@@ -34,11 +38,16 @@ func New(cfg Config) *Client {
 	if hc == nil {
 		hc = &http.Client{Timeout: 30 * time.Second}
 	}
+	appLogsIndex := cfg.AppLogsIndex
+	if appLogsIndex == "" {
+		appLogsIndex = defaultAppLogsIndex
+	}
 	return &Client{
-		baseURL:    base,
-		apiKey:     cfg.APIKey,
-		headers:    cfg.Headers,
-		httpClient: hc,
+		baseURL:      base,
+		apiKey:       cfg.APIKey,
+		headers:      cfg.Headers,
+		httpClient:   hc,
+		appLogsIndex: appLogsIndex,
 	}
 }
 
@@ -53,6 +62,23 @@ func (c *Client) get(ctx context.Context, path string, query url.Values, out any
 		return fmt.Errorf("apm: build request: %w", err)
 	}
 	req.Header.Set("Elastic-Api-Version", elasticAPIVersion)
+	return c.do(req, out)
+}
+
+// getRaw issues a GET without the APM date-versioned `Elastic-Api-Version`
+// header. Kibana's non-APM internal APIs (e.g. /internal/data_views/*) version
+// themselves with an `apiVersion` query parameter instead and reject the date
+// header.
+func (c *Client) getRaw(ctx context.Context, path string, query url.Values, out any) error {
+	rawURL := c.baseURL + path
+	if len(query) > 0 {
+		rawURL += "?" + query.Encode()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return fmt.Errorf("apm: build request: %w", err)
+	}
 	return c.do(req, out)
 }
 

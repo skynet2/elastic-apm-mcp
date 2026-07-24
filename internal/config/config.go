@@ -11,11 +11,12 @@ import (
 )
 
 type Config struct {
-	URL      string            `mapstructure:"url"`
-	APIKey   string            `mapstructure:"api_key"`
-	Headers  map[string]string `mapstructure:"headers"`
-	Timeout  time.Duration     `mapstructure:"timeout"`
-	LogLevel string            `mapstructure:"log_level"`
+	URL          string            `mapstructure:"url"`
+	APIKey       string            `mapstructure:"api_key"`
+	Headers      map[string]string `mapstructure:"headers"`
+	Timeout      time.Duration     `mapstructure:"timeout"`
+	LogLevel     string            `mapstructure:"log_level"`
+	AppLogsIndex string            `mapstructure:"app_logs_index"`
 }
 
 func Load(path string) (Config, error) {
@@ -25,8 +26,9 @@ func Load(path string) (Config, error) {
 
 	v.SetDefault("timeout", "30s")
 	v.SetDefault("log_level", "info")
+	v.SetDefault("app_logs_index", "fluent-bit-*")
 
-	for _, k := range []string{"url", "api_key", "timeout", "log_level"} {
+	for _, k := range []string{"url", "api_key", "timeout", "log_level", "app_logs_index"} {
 		if err := v.BindEnv(k); err != nil {
 			return Config{}, fmt.Errorf("config: bind env %s: %w", k, err)
 		}

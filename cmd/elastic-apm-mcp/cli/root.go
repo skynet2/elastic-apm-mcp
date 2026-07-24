@@ -42,9 +42,10 @@ func run(_ *cobra.Command, _ []string) error {
 		Level(parseLevel(cfg.LogLevel))
 
 	client := apm.New(apm.Config{
-		BaseURL: cfg.URL,
-		APIKey:  cfg.APIKey,
-		Headers: cfg.Headers,
+		BaseURL:      cfg.URL,
+		APIKey:       cfg.APIKey,
+		Headers:      cfg.Headers,
+		AppLogsIndex: cfg.AppLogsIndex,
 		HTTPClient: &http.Client{
 			Timeout: cfg.Timeout,
 		},

@@ -18,11 +18,16 @@ type APMClient interface {
 	ErrorGroups(ctx context.Context, p apm.ErrorGroupsParams) (map[string]any, error)
 	ErrorGet(ctx context.Context, p apm.ErrorGetParams) ([]map[string]any, error)
 	LogsSearch(ctx context.Context, p apm.LogsParams) ([]map[string]any, error)
+	AppLogsSearch(ctx context.Context, p apm.AppLogsParams) ([]map[string]any, error)
+	TraceLogs(ctx context.Context, p apm.TraceLogsParams) ([]map[string]any, error)
 	TraceSearch(ctx context.Context, p apm.TraceSearchParams) ([]map[string]any, error)
 	ServiceDependencies(ctx context.Context, p apm.DependenciesParams) ([]apm.ServiceDependency, error)
 	Environments(ctx context.Context, start, end string) ([]string, error)
 	GetAPMIndices(ctx context.Context) (apm.APMIndices, error)
-	RawSearch(ctx context.Context, index string, body map[string]any) ([]map[string]any, error)
+	ListIndices(ctx context.Context, pattern string) ([]string, error)
+	DescribeFields(ctx context.Context, pattern string) ([]apm.Field, error)
+	RawSearch(ctx context.Context, index string, body map[string]any) (apm.SearchResult, error)
+	ESQL(ctx context.Context, query string) (apm.ESQLResult, error)
 }
 
 var _ APMClient = (*apm.Client)(nil)
